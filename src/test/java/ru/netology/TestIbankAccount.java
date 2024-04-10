@@ -37,7 +37,7 @@ public class TestIbankAccount {
         var expectedCardBalance = cardBalance - amount;
         var expectedSecondCardBalance = secondCardBalance + amount;
         var trasferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
-        dashboardPage = tranferPage.makeValidTransfer(String.valueOf(amount), cardInfo);
+        dashboardPage = transferPage.makeValidTransfer(String.valueOf(amount), cardInfo);
         var actualCardBalance = dashboardPage.getCardBalance(cardInfo);
         var actualSecondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
         assertAll(() -> assertEquals(expectedCardBalance, actualCardBalance),
