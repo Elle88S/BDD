@@ -36,7 +36,7 @@ public class TestIbankAccount {
         var amount = generateValidAmount(cardBalance);
         var expectedCardBalance = cardBalance - amount;
         var expectedSecondCardBalance = secondCardBalance + amount;
-        var trasferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
+        var transferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
         dashboardPage = transferPage.makeValidTransfer(String.valueOf(amount), cardInfo);
         var actualCardBalance = dashboardPage.getCardBalance(cardInfo);
         var actualSecondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
@@ -45,5 +45,32 @@ public class TestIbankAccount {
 
     }
 
+    @Test
+    void shouldTransferMoneyFromAnotherCard() {
+        var amount = generateValidAmount(secondCardBalance);
+        var expectedCardBalance = secondCardBalance - amount;
+        var expectedSecondCardBalance = cardBalance + amount;
+        var transferPage = dashboardPage.selectCardToTransfer(cardInfo);
+        dashboardPage = transferPage.makeValidTransfer(String.valueOf(amount), cardInfo);
+        var actualCardBalance = dashboardPage.getCardBalance(cardInfo);
+        var actualSecondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
+        assertAll(() -> assertEquals(expectedCardBalance, actualCardBalance),
+                () -> assertEquals(expectedSecondCardBalance, actualSecondCardBalance));
 
+    }
+
+    @Test
+    void shouldNotTransferMoney() {
+        var amount = generateInvalidAmount(cardBalance);
+        var transferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
+        transferPage.makeTransfer(String.valueOf(amount), cardInfo);
+        transferPage.findErrorMessage("Выполнена попытка перевода суммы, превышающей остаток на карте");
+        var actualBalanceFirstCard = dashboardPage.getCardBalance(cardInfo);
+        var actualBalanceSecondCard = dashboardPage.getCardBalance(secondCardInfo);
+        assertAll(() -> transferPage.findErrorMessage("Выполнена попытка перевода суммы, превышающей остаток на карте"),
+                () -> assertEquals(cardBalance, actualBalanceFirstCard),
+                () -> assertEquals(secondCardBalance, actualBalanceSecondCard));
+
+
+    }
 }
